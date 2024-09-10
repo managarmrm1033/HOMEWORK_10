@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation</title>
+    <style>
+        nav {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+            padding: 10px 30px;
+            background-color: #f8f9fa;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 15px;
+        }
+        li {
+            display: inline;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .welcome {
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            <ul>
+                <li><a href="{% url 'noteapp:note' %}" role="button">Add Note</a></li>
+                <li><a href="{% url 'noteapp:tag' %}" role="button">Add Tag</a></li>
+                <li class="welcome">Welcome <b>{{ user.username }}!</b></li>
+                <li><a href="{% url 'users:profile' %}" role="button">Profile</a></li>
+                <li><a href="{% url 'users:logout' %}" role="button">Logout</a></li>
+            </ul>
+        {% else %}
+            <ul>
+                <li><a href="{% url 'users:signup' %}" role="button">Sign Up</a></li>
+                <li><a href="{% url 'users:login' %}" role="button">Login</a></li>
+            </ul>
+        {% endif %}
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
