@@ -18,10 +18,27 @@ from django.http import JsonResponse
 
 from django.db.models import Count
 
+from django.core.paginator import Paginator
+
+
 def main(request):
     notes = Note.objects.filter(user=request.user).all() if request.user.is_authenticated else []
     authors = Author.objects.all()
-    return render(request, 'noteapp/index.html', {"notes": notes, "authors": authors})
+
+    # Get top 10 tags by the number of associated notes
+    top_tags = Tag.objects.annotate(num_notes=Count('note')).order_by('-num_notes')[:10]
+
+    # Paginate notes
+    paginator = Paginator(notes, 5)  # Show 10 notes per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'noteapp/index.html', {
+        "notes": page_obj.object_list,
+        "authors": authors,
+        "top_tags": top_tags,
+        "page_obj": page_obj
+    })
 
 @login_required
 def tag(request):
@@ -119,8 +136,25 @@ def author_detail(request, pk):
     author = get_object_or_404(Author, pk=pk)
     return render(request, 'noteapp/authors_detail.html', {'author': author})
 
+
 def tagged_notes(request, tag_name):
     tag = get_object_or_404(Tag, name=tag_name)
     notes = tag.note_set.all()
-    return render(request, 'noteapp/tagged_notes.html', {'notes': notes, 'tag': tag})
+
+    # Пагінація для нотаток
+    paginator = Paginator(notes, 5)  # 5 нотаток на сторінку
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'noteapp/tagged_notes.html', {'notes': page_obj, 'tag': tag})
+
+def notes_by_tag(request, tag_id):
+    tag = get_object_or_404(Tag, id=tag_id)
+    notes = Note.objects.filter(tags=tag)
+
+    paginator = Paginator(notes, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'noteapp/notes_by_tag.html', {'tag': tag, 'page_obj': page_obj})
 

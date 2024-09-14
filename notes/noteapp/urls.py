@@ -19,4 +19,5 @@ urlpatterns = [
     path('notes/<int:pk>/', note_detail, name='note_detail'),
     path('notes/<int:id>/', views.note_detail, name='note_detail'),
     path('tag/<str:tag_name>/', views.tagged_notes, name='tagged_notes'),
+    path('tag/<int:tag_id>/', views.notes_by_tag, name='notes_by_tag'),
 ]

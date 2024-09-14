@@ -119,6 +119,34 @@
             font-size: 0.9em;
             color: #aaa;
         }
+        .top-tags {
+            margin-top: 40px;
+        }
+        .top-tags h2 {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+        .top-tags ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .top-tags li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+        }
+        .top-tags li a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        .top-tags li a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -141,7 +169,6 @@
 
     <div class="container">
         {% block content %}
-
         <!-- Form for adding a new author -->
         <section>
             <h2>Add New Author</h2>
@@ -174,6 +201,23 @@
                 </ul>
             {% else %}
                 <p>No notes available.</p>
+            {% endif %}
+        </section>
+
+        <!-- Top Ten Tags -->
+        <section class="top-tags">
+            <h2>Top Ten Tags</h2>
+            {% if top_tags %}
+                <ul>
+                    {% for tag in top_tags %}
+                        <li>
+                            <a href="{% url 'noteapp:tagged_notes' tag.name %}">{{ tag.name }}</a>
+                            <span>({{ tag.num_notes }} notes)</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No tags available.</p>
             {% endif %}
         </section>
 
