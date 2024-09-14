@@ -1,12 +1,28 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
+
+from django.shortcuts import render
 
 from .forms import TagForm, NoteForm
 from .models import Tag, Note
 
+from .forms import AuthorForm
+
+from .models import Author
+
+from django.contrib import messages
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Note
+
+from django.http import JsonResponse
+
+from django.db.models import Count
+
 def main(request):
     notes = Note.objects.filter(user=request.user).all() if request.user.is_authenticated else []
-    return render(request, 'noteapp/index.html', {"notes": notes})
+    authors = Author.objects.all()
+    return render(request, 'noteapp/index.html', {"notes": notes, "authors": authors})
+
 @login_required
 def tag(request):
     if request.method == 'POST':
@@ -27,7 +43,7 @@ def note(request):
     tags = Tag.objects.filter(user=request.user).all()
 
     if request.method == 'POST':
-        form = NoteForm(request.POST)
+        form = NoteForm(request.POST, user=request.user)
         if form.is_valid():
             new_note = form.save(commit=False)
             new_note.user = request.user
@@ -35,12 +51,19 @@ def note(request):
             choice_tags = Tag.objects.filter(name__in=request.POST.getlist('tags'), user=request.user)
             for tag in choice_tags.iterator():
                 new_note.tags.add(tag)
-
             return redirect(to='noteapp:main')
-        else:
-            return render(request, 'noteapp/note.html', {"tags": tags, 'form': form})
+    else:
+        form = NoteForm(user=request.user)
 
-    return render(request, 'noteapp/note.html', {"tags": tags, 'form': NoteForm()})
+    return render(request, 'noteapp/note.html', {"tags": tags, 'form': form})
+
+def note_list(request):
+    notes = Note.objects.all()
+    return render(request, 'noteapp/note_list.html', {'notes': notes})
+
+def note_detail(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    return render(request, 'noteapp/note_detail.html', {'note': note})
 
 
 @login_required
@@ -56,10 +79,48 @@ def set_done(request, note_id):
 
 
 @login_required
-def delete_note(request, note_id):
-    Note.objects.get(pk=note_id, user=request.user).delete()
-    return redirect(to='noteapp:main')
-
+def delete_note(request, id):
+    if request.method == 'POST':
+        note = get_object_or_404(Note, id=id)
+        note.delete()
+        return redirect('noteapp:note_list')
+    else:
+        return HttpResponseNotAllowed(['POST'])
 @login_required
 def profile(request):
     return render(request, 'users/profile.html')
+
+@login_required
+def add_author(request):
+    if request.method == 'POST':
+        form = AuthorForm(request.POST)
+        if form.is_valid():
+            author = form.save(commit=False)
+            author.user = request.user
+            author.save()
+            return redirect(to='noteapp:author_list')  #'author_list'
+    else:
+        form = AuthorForm()
+    return render(request, 'noteapp/add_author.html', {'form': form})
+
+
+def author_list(request):
+    authors = Author.objects.all()
+    return render(request, 'noteapp/author_list.html', {'authors': authors})
+
+@login_required
+def delete_author(request, author_id):
+    if request.method == 'POST':
+        author = get_object_or_404(Author, id=author_id)
+        author.delete()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+def author_detail(request, pk):
+    author = get_object_or_404(Author, pk=pk)
+    return render(request, 'noteapp/authors_detail.html', {'author': author})
+
+def tagged_notes(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    notes = tag.note_set.all()
+    return render(request, 'noteapp/tagged_notes.html', {'notes': notes, 'tag': tag})
+

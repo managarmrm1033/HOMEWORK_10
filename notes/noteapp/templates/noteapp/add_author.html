@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Author</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+            padding: 10px 30px;
+            background-color: #f8f9fa;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        li {
+            display: inline;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .welcome {
+            margin-left: auto;
+            font-size: 1.1em;
+            color: #343a40;
+        }
+        .welcome b {
+            color: #007bff;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .container {
+            padding: 20px;
+        }
+        form {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        form input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            <ul>
+                <li><a href="{% url 'noteapp:note' %}" class="btn-primary" role="button">Add Note</a></li>
+                <li><a href="{% url 'noteapp:tag' %}" class="btn-primary" role="button">Add Tag</a></li>
+                <li><a href="{% url 'noteapp:add_author' %}" class="btn-primary" role="button">Add Author</a></li>
+                <li class="welcome">Welcome, <b>{{ user.username }}</b>!</li>
+                <li><a href="{% url 'users:profile' %}" class="btn-secondary" role="button">Profile</a></li>
+                <li><a href="{% url 'users:logout' %}" class="btn-secondary" role="button">Logout</a></li>
+            </ul>
+        {% else %}
+            <ul>
+                <li><a href="{% url 'users:signup' %}" class="btn-primary" role="button">Sign Up</a></li>
+                <li><a href="{% url 'users:login' %}" class="btn-primary" role="button">Login</a></li>
+            </ul>
+        {% endif %}
+    </nav>
+
+    <div class="container">
+        <h1>Add New Author</h1>
+
+        <form method="POST" action="{% url 'noteapp:add_author' %}">
+            {% csrf_token %}
+            <div>
+                <label for="{{ form.name.id_for_label }}">Author Name:</label>
+                {{ form.name }}
+                <span>{{ form.errors.name }}</span>
+            </div>
+            <button type="submit">Add Author</button>
+        </form>
+    </div>
+</body>
+</html>

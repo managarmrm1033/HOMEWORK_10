@@ -1,34 +1,30 @@
 {% extends "noteapp/base.html" %}
 
 {% block content %}
-
+<h2>Add Note</h2>
 <form method="POST" action="{% url 'noteapp:note' %}">
     {% csrf_token %}
-    <div style="padding: 10px">
-        <label> Note name:
-            {{ form.name }}
-        </label>
-        <span>{{ form.errors.name }}</span>
+    <div>
+        <label for="id_name">Note Name:</label>
+        {{ form.name }}
+        <span>{{ form.name.errors }}</span>
     </div>
-    <div style="padding: 10px">
-        <label> Note description:
-            {{ form.description }}
-        </label>
-        <span>{{ form.errors.description }}</span>
+    <div>
+        <label for="id_description">Description:</label>
+        {{ form.description }}
+        <span>{{ form.description.errors }}</span>
     </div>
-    <div style="padding: 10px">
-        <label> Select tags:
-            <select name="tags" multiple="multiple" required>
-                {% for tag in tags %}
-                <option value="{{tag.name}}">{{tag.name}}</option>
-                {% endfor %}
-            </select>
-        </label>
+    <div>
+        <label for="id_author">Select Author:</label>
+        {{ form.author }}
+        <span>{{ form.author.errors }}</span>
     </div>
-    <div class="grid">
-        <button type="submit">Submit</button>
-        <button type="reset" class="secondary">Reset</button>
+    <div>
+        <label>Select Tags:</label>
+        {% for tag in tags %}
+            <label><input type="checkbox" name="tags" value="{{ tag.name }}"> {{ tag.name }}</label>
+        {% endfor %}
     </div>
+    <button type="submit">Add Note</button>
 </form>
 {% endblock %}
-l>

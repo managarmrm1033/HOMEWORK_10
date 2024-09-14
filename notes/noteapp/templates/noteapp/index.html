@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navigation</title>
+    <title>Home Page</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
         nav {
             margin-bottom: 20px;
             border-bottom: 2px solid #ddd;
@@ -17,6 +22,7 @@
             margin: 0;
             display: flex;
             gap: 15px;
+            align-items: center;
         }
         li {
             display: inline;
@@ -34,28 +40,144 @@
         }
         .welcome {
             margin-left: auto;
+            font-size: 1.1em;
+            color: #343a40;
+        }
+        .welcome b {
+            color: #007bff;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .container {
+            padding: 20px;
+        }
+        .author-list-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .author-list-button:hover {
+            background-color: #218838;
+        }
+        .note-list {
+            margin-top: 40px;
+        }
+        .note-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .note-list li {
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s ease;
+        }
+        .note-list li:hover {
+            background-color: #e8f5e9;
+        }
+        .note-title {
+            font-size: 1.2em;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .note-content {
+            margin-top: 10px;
+            font-size: 1em;
+            color: #666;
+        }
+        .note-meta {
+            font-size: 0.9em;
+            color: #aaa;
         }
     </style>
 </head>
 <body>
     <nav>
-        {% if user.is_authenticated %}
-            <ul>
-                <li><a href="{% url 'noteapp:note' %}" role="button">Add Note</a></li>
-                <li><a href="{% url 'noteapp:tag' %}" role="button">Add Tag</a></li>
-                <li class="welcome">Welcome <b>{{ user.username }}!</b></li>
-                <li><a href="{% url 'users:profile' %}" role="button">Profile</a></li>
-                <li><a href="{% url 'users:logout' %}" role="button">Logout</a></li>
-            </ul>
-        {% else %}
-            <ul>
-                <li><a href="{% url 'users:signup' %}" role="button">Sign Up</a></li>
-                <li><a href="{% url 'users:login' %}" role="button">Login</a></li>
-            </ul>
-        {% endif %}
+        <ul>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'noteapp:note' %}" class="btn-primary" role="button">Add Note</a></li>
+                <li><a href="{% url 'noteapp:tag' %}" class="btn-primary" role="button">Add Tag</a></li>
+                <li><a href="{% url 'noteapp:note_list' %}" class="btn-secondary">Note List</a></li>
+                <li><a href="{% url 'noteapp:author_list' %}" class="btn-secondary">Author List</a></li>
+                <li class="welcome">Welcome, <b>{{ user.username }}</b>!</li>
+                <li><a href="{% url 'users:profile' %}" class="btn-secondary" role="button">Profile</a></li>
+                <li><a href="{% url 'users:logout' %}" class="btn-secondary" role="button">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'users:signup' %}" class="btn-primary" role="button">Sign Up</a></li>
+                <li><a href="{% url 'users:login' %}" class="btn-primary" role="button">Login</a></li>
+            {% endif %}
+        </ul>
     </nav>
 
-    {% block content %}
-    {% endblock %}
+    <div class="container">
+        {% block content %}
+
+        <!-- Form for adding a new author -->
+        <section>
+            <h2>Add New Author</h2>
+            <form method="POST" action="{% url 'noteapp:add_author' %}">
+                {% csrf_token %}
+                <div>
+                    <label for="{{ form.name.id_for_label }}">Author Name:</label>
+                    {{ form.name }}
+                    <span>{{ form.errors.name }}</span>
+                </div>
+                <button type="submit">Add Author</button>
+            </form>
+        </section>
+
+        <!-- Button to go to the author list page -->
+        <a href="{% url 'noteapp:author_list' %}" class="author-list-button">View Author List</a>
+
+        <!-- List of Notes -->
+        <section class="note_list">
+            <h2>Notes</h2>
+            {% if notes %}
+                <ul>
+                    {% for note in notes %}
+                        <li>
+                            <a href="{% url 'noteapp:note_detail' note.id %}" class="note-title">{{ note.title }}</a>
+                            <p class="note-content">{{ note.content|truncatewords:20 }}</p>
+                            <div class="note-meta">Created on: {{ note.created_at|date:"F j, Y" }}</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No notes available.</p>
+            {% endif %}
+        </section>
+
+        {% endblock %}
+    </div>
 </body>
 </html>

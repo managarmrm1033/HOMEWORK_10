@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ author.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #555;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        a {
+            display: inline-block;
+            padding: 10px 15px;
+            color: #fff;
+            background-color: #007bff; /* Default blue color */
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        a:hover {
+            background-color: #28a745; /* Green color on hover */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ author.name }} {{ author.surname }}</h1>
+        <p>{{ author.biography|linebreaksbr }}</p>
+
+        {% if author.notes %}
+            <h2>Notes by {{ author.name }}</h2>
+            <ul>
+                {% for note in author.notes %}
+                    <li>
+                        <a href="{% url 'note_detail' note.id %}">{{ note.title }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No notes available for this author.</p>
+        {% endif %}
+
+        <a href="{% url 'author_list' %}">Back to Authors List</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Detail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .note-content {
+            margin-bottom: 20px;
+        }
+        .note-content p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #555;
+        }
+        .note-info {
+            font-size: 14px;
+            color: #888;
+        }
+        .note-info span {
+            display: block;
+            margin-top: 5px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>{{ note.title }}</h2>
+        <div class="note-content">
+            <p>{{ note.text }}</p>
+        </div>
+        <div class="note-info">
+            <span><strong>Author:</strong>
+                {% if note.author %}
+                  {{ note.author.name }}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </span>
+            <span><strong>Created:</strong> {{ note.created_at }}</span>
+        </div>
+        <a href="{% url 'noteapp:note_list' %}" class="btn">Back to Notes</a>
+        <a href="{% url 'noteapp:note_detail' note.id %}" class="note-title">{{ note.title }}</a>
+        <form method="POST" action="{% url 'noteapp:delete_note' note.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete Note</button>
+        </form>
+    </div>
+</body>
+</html>
