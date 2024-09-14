@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import author_detail, note_list, note_detail
+from .views import scrape_data_view
 
 app_name = 'noteapp'
 
@@ -20,4 +21,5 @@ urlpatterns = [
     path('notes/<int:id>/', views.note_detail, name='note_detail'),
     path('tag/<str:tag_name>/', views.tagged_notes, name='tagged_notes'),
     path('tag/<int:tag_id>/', views.notes_by_tag, name='notes_by_tag'),
+    path('scrape/', scrape_data_view, name='scrape_data'),
 ]

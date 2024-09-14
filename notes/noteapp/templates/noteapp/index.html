@@ -147,6 +147,26 @@
         .top-tags li a:hover {
             text-decoration: underline;
         }
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .pagination a {
+            text-decoration: none;
+            color: #007bff;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .pagination a:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .pagination .disabled {
+            color: #aaa;
+            padding: 5px 10px;
+        }
     </style>
 </head>
 <body>
@@ -169,6 +189,7 @@
 
     <div class="container">
         {% block content %}
+
         <!-- Form for adding a new author -->
         <section>
             <h2>Add New Author</h2>
@@ -179,26 +200,53 @@
                     {{ form.name }}
                     <span>{{ form.errors.name }}</span>
                 </div>
-                <button type="submit">Add Author</button>
+                <button type="submit" class="btn-primary">Add Author</button>
             </form>
         </section>
 
         <!-- Button to go to the author list page -->
         <a href="{% url 'noteapp:author_list' %}" class="author-list-button">View Author List</a>
 
+        <!-- Form for scraping data -->
+        <section>
+            <h2>Scrape Data</h2>
+            <form method="POST" action="{% url 'noteapp:scrape_data' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-primary">Scrape Data</button>
+            </form>
+        </section>
+
         <!-- List of Notes -->
-        <section class="note_list">
+        <section class="note-list">
             <h2>Notes</h2>
             {% if notes %}
                 <ul>
                     {% for note in notes %}
                         <li>
-                            <a href="{% url 'noteapp:note_detail' note.id %}" class="note-title">{{ note.title }}</a>
-                            <p class="note-content">{{ note.content|truncatewords:20 }}</p>
-                            <div class="note-meta">Created on: {{ note.created_at|date:"F j, Y" }}</div>
+                            <a href="{% url 'noteapp:note_detail' note.id %}" class="note-title">{{ note.name }}</a>
+                            <p class="note-content">{{ note.description|truncatewords:20 }}</p>
+                            <div class="note-meta">Created on: {{ note.created|date:"F j, Y" }}</div>
                         </li>
                     {% endfor %}
                 </ul>
+                <!-- Pagination -->
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    {% else %}
+                        <span class="disabled">First</span>
+                        <span class="disabled">Previous</span>
+                    {% endif %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                    {% else %}
+                        <span class="disabled">Next</span>
+                        <span class="disabled">Last</span>
+                    {% endif %}
+                </div>
             {% else %}
                 <p>No notes available.</p>
             {% endif %}

@@ -20,6 +20,7 @@ from django.db.models import Count
 
 from django.core.paginator import Paginator
 
+from bs4 import BeautifulSoup
 
 def main(request):
     notes = Note.objects.filter(user=request.user).all() if request.user.is_authenticated else []
@@ -158,3 +159,36 @@ def notes_by_tag(request, tag_id):
 
     return render(request, 'noteapp/notes_by_tag.html', {'tag': tag, 'page_obj': page_obj})
 
+def scrape_data():
+    url = 'URL_ВАШОГО_САЙТУ'
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    notes = []
+
+    for item in soup.find_all('div', class_='note-item'):
+        title = item.find('h2').get_text()
+        content = item.find('p').get_text()
+
+        notes.append({'title': title, 'content': content})
+
+    return notes
+
+def save_notes_to_db(notes):
+    for note in notes:
+        Note.objects.create(
+            name=note['title'],
+            description=note['content'],
+            done=False,
+            user=User.objects.first()
+        )
+
+@login_required
+def scrape_data_view(request):
+    if request.method == 'POST':
+        notes = scrape_data()
+        save_notes_to_db(notes)
+        messages.success(request, 'Data scraped and saved successfully!')
+        return redirect('main')
+    else:
+        return redirect('main')
